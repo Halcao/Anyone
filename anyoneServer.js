@@ -20,28 +20,89 @@ app.post('/update', urlencodedParser, function(req, res) {
     var items = list.split('\\n')
                 .filter( str => str.length >= 17)
                 .map(str => str.split(' '))
-                .map(arr => ({mac: arr[1], ip: arr[2], name: arr[3]}));
-    
-    //connection.connect();
-    connection.query("UPDATE user SET is_present = 0");    
-    for (var item of items) {
-        connection.query("UPDATE user SET is_present = 1 WHERE mac = ?", [item.mac]);
-    }
-    var response = {
-        "err_code": 0,
-        "msg": "ok"
-    }
-    //connection.end();    
-    res.send(JSON.stringify(response));
+                .map(arr => ({mac: arr[1], ip: arr[2], defaultName: arr[3]}));
+    var macData = items.map(e => e.mac);
+    var newDate = new Date();
+    newDate.setTime(req.body.date * 1000);
+
+    connection.query("SELECT s.id, u.mac, s.is_present FROM status AS s INNER JOIN user AS u ON u.id = s.id", function(err, result) {
+        if (err) {
+            console.log('[SELECT ERROR] - ',err.message);
+            var response = {
+                "err_code": err.code,
+                "msg": err.message,
+            }
+            //connection.end();    
+            res.send(JSON.stringify(response));
+            return;
+        }
+        
+        // 在线用户
+        var allPresentMembers = result.filter(e => macData.indexOf(e.mac) >= 0).map(e => e.id);
+        // 上次在线用户
+        var lastPresentMembers = result.filter(e => e.isPresent == 1).map(e => e.id)
+
+        // 新来的用户 allPresentMembers - lastPresentMembers
+        var newComers = allPresentMembers.filter(function(id) {
+            return lastPresentMembers.indexOf(id) < 0;
+        });
+        // 刚走的用户 lastPresentMembers - allPresentMembers
+        var newLeavers = lastPresentMembers.filter(function(id) {
+            return allPresentMembers.indexOf(id) < 0;
+        });
+
+        for (var id of newComers) {
+            var formatedDate = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
+            connection.query(`UPDATE status SET is_present = true, update_at = '${formatedDate}' WHERE id = ${id}`);
+            connection.query(`INSERT INTO log VALUES (0, ?, ?, ?)`, [id, "enter", formatedDate]);
+            // connection.query(`INSERT INTO log(id, action, time) VALUES (0, ?, ?, ?)`, [id, "enter", formatedDate]);
+        }
+
+        for (var id of newLeavers) {
+            var formatedDate = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
+            connection.query(`UPDATE status SET is_present = false, update_at = '${formatedDate}' WHERE id = ${id}`);
+            connection.query(`INSERT INTO log VALUES (0, ?, ?, ?)`, [id, "leave", formatedDate]);
+            // connection.query(`INSERT INTO log(id, action, time) VALUES (?, ?, ?)`, [id, "leave", formatedDate]);
+        }
+
+        // for (var id of allPresentMembers) {
+        //     var formatedDate = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
+        //     connection.query(`UPDATE SET total_time = total_time + 1, week_time = week_time + 1, update_at = ${formatedDate} FROM stat WHERE id = ?`, [id]);
+        //     var ip = items
+        //     connection.query(`UPDATE SET ip = ? FROM status`, []);
+        // }
+        for (var item of items) {
+            var formatedDate = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
+            var id = result.filter(e => e.mac = item.mac)[0].id;
+            connection.query(`UPDATE stat SET total_time = total_time + 1, week_time = week_time + 1, update_at = '${formatedDate}' WHERE id = ${id}`);
+            connection.query(`UPDATE status SET ip = '${item.ip}' WHERE id = ${id}`);
+        }
+
+            // 响应
+        var response = {
+            "err_code": 0,
+            "date": newDate.toLocaleString(),
+            "msg": "ok"
+        }
+        //connection.end();    
+        res.send(JSON.stringify(response));
+    })
 });
 
 app.get('/getPresent', function(req, res) {
-    connection.query('SELECT name FROM user WHERE is_present = true', function(err, result) {
+    connection.query('SELECT u.name FROM status AS s INNER JOIN user AS u WHERE s.is_present = true', function(err, result) {
         if (err) {
             console.log('[SELECT ERROR] - ',err.message);
+            var response = {
+                "err_code": err.code,
+                "msg": err.message,
+            }
+            //connection.end();    
+            res.send(JSON.stringify(response));
             return;
         }
-        var names = {list: result.map(item => item.name)};
+        var newDate = new Date();    
+        var names = {"list": result, "date": newDate.toLocaleString()};
         res.send(JSON.stringify(names))
     });
 });
