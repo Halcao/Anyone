@@ -17,13 +17,51 @@ app.post('/update', urlencodedParser, function(req, res) {
     console.log(req.body);
     var list = req.body.list;
     // 每一行至少得有17位的 MAC 地址吧
-    var items = list.split('\\n')
+    var items = list.replace('\\n', '')
+                .replace('\n', '')
+                .split('$')
                 .filter( str => str.length >= 17)
                 .map(str => str.split(' '))
                 .map(arr => ({mac: arr[1], ip: arr[2], defaultName: arr[3]}));
     var macData = items.map(e => e.mac);
     var newDate = new Date();
     newDate.setTime(req.body.date * 1000);
+
+    connection.query("SELECT mac FROM user", function(err, result) {
+        if (err) {
+            console.log('[SELECT ERROR] - ',err.message);
+            var response = {
+                "err_code": err.code,
+                "msg": err.message,
+            }
+            //connection.end();    
+            res.send(JSON.stringify(response));
+            return;
+        }
+        var userList = result.map(e => e.mac);
+        var newUsers = items.filter(function(e) {
+            return userList.indexOf(e.mac) < 0;
+        });
+        var formatedDate = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');        
+        for (var user of newUsers) {
+            connection.query(`INSERT INTO user(id, name, mac, default_name, insert_at) VALUES (0, '${user.defaultName}', '${user.mac}', '${user.defaultName}', '${formatedDate}')`, function(err, result) {
+                if (err) {
+                    console.log('[SELECT ERROR] - ',err.message);
+                    var response = {
+                        "err_code": err.code,
+                        "msg": err.message,
+                    }
+                    //connection.end();    
+                    res.send(JSON.stringify(response));
+                    return;
+                }
+                connection.query(`INSERT INTO status(id, is_present, ip, update_at) VALUES (${result.insertId}, 0, '${user.ip}', '${formatedDate}')`);
+                connection.query(`INSERT INTO stat(id, week_time, total_time, update_at) VALUES (${result.insertId}, 0, 0, '${formatedDate}')`);
+            });
+
+            // connection.query("");
+        }
+    });
 
     connection.query("SELECT s.id, u.mac, s.is_present FROM status AS s INNER JOIN user AS u ON u.id = s.id", function(err, result) {
         if (err) {
@@ -40,7 +78,7 @@ app.post('/update', urlencodedParser, function(req, res) {
         // 在线用户
         var allPresentMembers = result.filter(e => macData.indexOf(e.mac) >= 0).map(e => e.id);
         // 上次在线用户
-        var lastPresentMembers = result.filter(e => e.isPresent == 1).map(e => e.id)
+        var lastPresentMembers = result.filter(e => e.is_present == 1).map(e => e.id)
 
         // 新来的用户 allPresentMembers - lastPresentMembers
         var newComers = allPresentMembers.filter(function(id) {
@@ -73,9 +111,12 @@ app.post('/update', urlencodedParser, function(req, res) {
         // }
         for (var item of items) {
             var formatedDate = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
-            var id = result.filter(e => e.mac = item.mac)[0].id;
-            connection.query(`UPDATE stat SET total_time = total_time + 1, week_time = week_time + 1, update_at = '${formatedDate}' WHERE id = ${id}`);
-            connection.query(`UPDATE status SET ip = '${item.ip}' WHERE id = ${id}`);
+            var array = result.filter(e => e.mac === item.mac);
+            if (array.length == 1) {
+                var id = array[0].id;
+                connection.query(`UPDATE stat SET total_time = total_time + 1, week_time = week_time + 1, update_at = '${formatedDate}' WHERE id = ${id}`);
+                connection.query(`UPDATE status SET ip = '${item.ip}' WHERE id = ${id}`);    
+            }
         }
 
             // 响应
@@ -90,7 +131,7 @@ app.post('/update', urlencodedParser, function(req, res) {
 });
 
 app.get('/getPresent', function(req, res) {
-    connection.query('SELECT u.name FROM status AS s INNER JOIN user AS u WHERE s.is_present = true', function(err, result) {
+    connection.query('SELECT DISTINCT u.name FROM status AS s INNER JOIN user AS u WHERE s.is_present = true', function(err, result) {
         if (err) {
             console.log('[SELECT ERROR] - ',err.message);
             var response = {
