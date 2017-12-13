@@ -32,7 +32,7 @@ app.post('/update', urlencodedParser, function(req, res) {
             console.log('[SELECT ERROR] - ',err.message);
             var response = {
                 "err_code": err.code,
-                "msg": err.message,
+                "msg": err.message
             }
             //connection.end();    
             res.send(JSON.stringify(response));
@@ -49,7 +49,7 @@ app.post('/update', urlencodedParser, function(req, res) {
                     console.log('[SELECT ERROR] - ',err.message);
                     var response = {
                         "err_code": err.code,
-                        "msg": err.message,
+                        "msg": err.message
                     }
                     //connection.end();    
                     res.send(JSON.stringify(response));
@@ -68,7 +68,7 @@ app.post('/update', urlencodedParser, function(req, res) {
             console.log('[SELECT ERROR] - ',err.message);
             var response = {
                 "err_code": err.code,
-                "msg": err.message,
+                "msg": err.message
             }
             //connection.end();    
             res.send(JSON.stringify(response));
@@ -131,21 +131,48 @@ app.post('/update', urlencodedParser, function(req, res) {
 });
 
 app.get('/getPresent', function(req, res) {
-    connection.query('SELECT DISTINCT u.name FROM status AS s INNER JOIN user AS u WHERE s.is_present = true', function(err, result) {
+    connection.query('SELECT DISTINCT u.name, ip, update_at FROM status AS s INNER JOIN user AS u ON u.id = s.id WHERE s.is_present = true', function(err, result) {
         if (err) {
             console.log('[SELECT ERROR] - ',err.message);
             var response = {
                 "err_code": err.code,
-                "msg": err.message,
+                "msg": err.message
             }
             //connection.end();    
             res.send(JSON.stringify(response));
             return;
         }
-        var newDate = new Date();    
-        var names = {"list": result, "date": newDate.toLocaleString()};
+        var names = {"list": result};
         res.send(JSON.stringify(names))
     });
+});
+
+app.put('/reset', function(req, res) {
+    var date = new Date;
+    // 周日清空
+    if (date.getDay() == 0) {
+        connection.query("UPDATE stat SET week_time = 0", function(err, result) {
+            if (err) {
+                var response = {
+                    "err_code": err.code,
+                    "msg": err.message
+                }
+                res.send(JSON.stringify(response))
+                return
+            }    
+            var response = {
+                "err_code": 0,
+                "msg": "reset ok"
+            }
+            res.send(JSON.stringify(response))                
+        });        
+    } else {
+        var response = {
+            "err_code": 2,
+            "msg": "cannot reset now"
+        }
+        res.send(JSON.stringify(response))                  
+    }
 });
 
 var server = app.listen(8080, function() {
