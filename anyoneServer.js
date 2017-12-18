@@ -142,7 +142,11 @@ app.get('/getPresent', function(req, res) {
             res.send(JSON.stringify(response));
             return;
         }
+        for (var item of result) {
+            item.update_at = new Date(item.update_at).toLocaleString()
+        }
         var names = {"list": result};
+        res.setHeader('Access-Control-Allow-Origin', "*")
         res.send(JSON.stringify(names))
     });
 });
