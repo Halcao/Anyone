@@ -138,7 +138,7 @@ extension ViewController: UITableViewDataSource {
         let dateLabel = UILabel()
         dateLabel.font = RobotoFont.regular(with: 12)
         dateLabel.textColor = Color.grey.base
-        dateLabel.text = Date().description
+        dateLabel.text = item.updateAt
         
         bottomBar.leftViews = [dateLabel]
         

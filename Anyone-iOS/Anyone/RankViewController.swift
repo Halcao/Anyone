@@ -153,7 +153,8 @@ extension RankViewController: UITableViewDataSource {
 
         cell.contentView.backgroundColor = Color.grey.lighten5
         
-        cell.contentView.layout(card).horizontally(left: 20, right: 20).center()
+//        cell.contentView.layout(card).horizontally(left: 20, right: 20).center()
+        cell.contentView.layout(card).horizontally(left: 0, right: 0).center()
         return cell
     }
 }
