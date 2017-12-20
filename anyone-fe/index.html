@@ -6,10 +6,17 @@
     <script src="./static/browser.min.js"></script>
     <script src="./static/jquery.min.js"></script>
     <link rel="stylesheet" href="./static/anyone.css" type="text/css">
+    <meta charset="UTF-8">
     <title>有人吗？</title>
+    <meta name=”viewport” content=”width=device-width, initial-scale=1, maximum-scale=1″>
     <meta name="description" content="Anyone there?">
   </head>
   <body>
+      <script>
+      document.body.addEventListener('touchstart', function () {}); 
+      document.body.addEventListener('touchend', function () {}); 
+    </script>
+
     <div id="userlist"></div>
     <script type="text/babel">
 
@@ -52,7 +59,7 @@
             }
             var userList = users.map(function (user, index) {
               return (
-                <li>
+                <li key={index}>
                 <div className="card" key={index}>
                   <p className="name-label">{user.name}</p>
                   <p className="bordered-label">{user.ip}</p>
