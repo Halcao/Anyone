@@ -1,0 +1,15 @@
+PODS:
+  - Alamofire (4.6.0)
+  - Material (2.0.0)
+
+DEPENDENCIES:
+  - Alamofire
+  - Material (= 2.0)
+
+SPEC CHECKSUMS:
+  Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
+  Material: 0ee6fc85d5b5db6ad22afd3c59edccf21024714e
+
+PODFILE CHECKSUM: e355b73041d375233e61c3cdab6db379db6264e9
+
+COCOAPODS: 1.3.1

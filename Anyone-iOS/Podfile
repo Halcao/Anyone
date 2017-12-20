@@ -7,4 +7,6 @@ target 'Anyone' do
 
   # Pods for Anyone
 
+	pod 'Material', '2.0'
+	pod 'Alamofire'
 end

@@ -179,6 +179,27 @@ app.put('/reset', function(req, res) {
     }
 });
 
+app.get('/getRank', function(req, res) {
+    connection.query('SELECT DISTINCT u.name, s.week_time, s.total_time, s.update_at FROM stat AS s INNER JOIN user AS u ON u.id = s.id', function(err, result) {
+        if (err) {
+            console.log('[SELECT ERROR] - ',err.message);
+            var response = {
+                "err_code": err.code,
+                "msg": err.message
+            }
+            //connection.end();    
+            res.send(JSON.stringify(response));
+            return;
+        }
+        for (var item of result) {
+            item.update_at = new Date(item.update_at).toLocaleString()
+        }
+        var names = {"list": result};
+        res.setHeader('Access-Control-Allow-Origin', "*")
+        res.send(JSON.stringify(names))
+    });
+});
+
 var server = app.listen(8080, function() {
     var host = server.address().address;
     var port = server.address().port;
