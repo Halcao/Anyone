@@ -53,11 +53,14 @@ class ViewController: UIViewController {
         let rankButton = IconButton(image: Icon.cm.menu)
         rankButton.addTarget(self, action: #selector(pushRankViewController), for: .touchUpInside)
         navigationItem.rightViews = [rankButton]
+        
+        // start refreshing
+        self.refreshControl.beginRefreshing()
         self.refresh()
     }
 
     func pushRankViewController() {
-        let rankVC = UIViewController()
+        let rankVC = RankViewController()
         self.navigationController?.pushViewController(rankVC, animated: true)
     }
 }
@@ -124,11 +127,9 @@ extension ViewController: UITableViewDataSource {
         let item = items[indexPath.row]
         let toolbar = Toolbar(rightViews: [])
         
-//        toolbar.title = "Material"
         toolbar.title = item.name
         toolbar.titleLabel.textAlignment = .left
         
-//                toolbar.detail = "Build Beautiful Software"
         toolbar.detail = item.ip
         toolbar.detailLabel.textAlignment = .left
         toolbar.detailLabel.textColor = Color.grey.base
@@ -165,7 +166,7 @@ extension ViewController: UITableViewDelegate {
 }
 
 // MARK: UIRefreshControl
-fileprivate extension UIRefreshControl {
+extension UIRefreshControl {
     func setRefreshControl(title: String, color: UIColor = .gray) {
         self.attributedTitle = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: color])
     }

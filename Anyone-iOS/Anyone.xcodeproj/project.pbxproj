@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		36BC05691FEA857000FA1769 /* RankViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BC05681FEA857000FA1769 /* RankViewController.swift */; };
+		36BC056B1FEA89BC00FA1769 /* StatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BC056A1FEA89BC00FA1769 /* StatModel.swift */; };
 		36C30E591FE8E4BE00C883A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C30E581FE8E4BE00C883A1 /* AppDelegate.swift */; };
 		36C30E5B1FE8E4BF00C883A1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C30E5A1FE8E4BF00C883A1 /* ViewController.swift */; };
 		36C30E601FE8E4BF00C883A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36C30E5F1FE8E4BF00C883A1 /* Assets.xcassets */; };
@@ -19,6 +20,7 @@
 
 /* Begin PBXFileReference section */
 		36BC05681FEA857000FA1769 /* RankViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankViewController.swift; sourceTree = "<group>"; };
+		36BC056A1FEA89BC00FA1769 /* StatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatModel.swift; sourceTree = "<group>"; };
 		36C30E551FE8E4BE00C883A1 /* Anyone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Anyone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36C30E581FE8E4BE00C883A1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		36C30E5A1FE8E4BF00C883A1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 				36C30E581FE8E4BE00C883A1 /* AppDelegate.swift */,
 				36C30E5A1FE8E4BF00C883A1 /* ViewController.swift */,
 				36FBCF9C1FEA481900C743F9 /* DeviceModel.swift */,
+				36BC056A1FEA89BC00FA1769 /* StatModel.swift */,
 				36BC05681FEA857000FA1769 /* RankViewController.swift */,
 				36C30E5F1FE8E4BF00C883A1 /* Assets.xcassets */,
 				36FBCF991FEA449100C743F9 /* AppNavigationController.swift */,
@@ -226,6 +229,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				36BC05691FEA857000FA1769 /* RankViewController.swift in Sources */,
+				36BC056B1FEA89BC00FA1769 /* StatModel.swift in Sources */,
 				36FBCF9A1FEA449100C743F9 /* AppNavigationController.swift in Sources */,
 				36FBCF9D1FEA481900C743F9 /* DeviceModel.swift in Sources */,
 				36C30E5B1FE8E4BF00C883A1 /* ViewController.swift in Sources */,
